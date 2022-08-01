@@ -9,6 +9,9 @@ function main() {
     var sin_wave = createSoundWaveform(ctx, (i) => {
         return Math.sin(i * 0.04) * 0.06;
     })
+    var sin_wave_fade = createModifiedSoundWaveform(ctx, sin_wave, (buffer, i) => {
+        return buffer[i] * ((-1 / buffer.length) * i + 1);
+    })
     var square_wave = createSoundWaveform(ctx, (i) => {
         return Math.sign(Math.sin(i * 0.04)) * 0.02;
     })
@@ -26,6 +29,10 @@ function main() {
     var sin_button = document.querySelector("#sinWave");
     sin_button.addEventListener("click", e => {
         playSound(ctx, sin_wave);
+    })
+    var sin_fade_button = document.querySelector("#sinWaveFadeOut");
+    sin_fade_button.addEventListener("click", e => {
+        playSound(ctx, sin_wave_fade);
     })
     var square_button = document.querySelector("#squareWave");
     square_button.addEventListener("click", e => {
@@ -51,6 +58,18 @@ function createSoundWaveform(ctx, modification_function) {
         }
     }
     return sound;
+}
+
+function createModifiedSoundWaveform(ctx, original_sound, modification_function) {
+    var new_sound = ctx.createBuffer(2, ctx.sampleRate * 4, ctx.sampleRate);
+    for(var channel = 0; channel < new_sound.numberOfChannels; channel++) {
+        const original_buffer = original_sound.getChannelData(channel);
+        const new_buffer = new_sound.getChannelData(channel);
+        for (var i = 0; i < new_sound.length; i++) {
+            new_buffer[i] = modification_function(original_buffer, i);
+        }
+    }
+    return new_sound;
 }
 
 function playSound(ctx, source) {
