@@ -47,6 +47,19 @@ function main() {
         playSound(ctx, sawtooth_wave);
     })
 
+
+    // Piano source for modulation
+    var piano_note;
+    fetch("sounds/044_Cs_4.mp3", {method: "GET"})
+    .then(response => response.arrayBuffer())
+    .then(buffer => ctx.decodeAudioData(buffer))
+    .then(data => piano_note = data);
+
+    var piano_button = document.querySelector("#pianoNote");
+    piano_button.addEventListener("click", e => {
+        playSound(ctx, piano_note);
+    })
+
 }
 
 function createSoundWaveform(ctx, modification_function) {
